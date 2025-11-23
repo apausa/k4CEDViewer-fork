@@ -67,26 +67,26 @@ struct DrawReconstructedParticles final : k4FWCore::Consumer<void(const edm4hep:
 
 
   Gaudi::Property<bool> drawEllipsoidForPFOClusters{ this, "DrawEllipsoidForPFOClusters" , false, 
-						      "draw ellipsoids for clusters" };
+						     "draw ellipsoids for clusters" };
 
   Gaudi::Property<bool> colorByEnergy{ this, "ColorByEnergy" , false, 
-				      "color recunstructed particle by energy" };
+				       "color recunstructed particle by energy" };
 
   Gaudi::Property<bool> colorByEnergyAuto{ this, "ColorByEnergyAuto" , false, 
-				      "Automatically adjust event by event the blue to min energy and red to max energy of event" };
+					   "Automatically adjust event by event the blue to min energy and red to max energy of event" };
   
   Gaudi::Property<double> colorByEnergyMin{ this, "ColorByEnergyMin" , 0.,
-					   "Minimal value for energy which will be represented as blue" };
+					    "Minimal value for energy which will be represented as blue" };
   
   Gaudi::Property<double> colorByEnergyMax{ this, "ColorByEnergyMax" , 10., 
-					   "Maximal value for energy which will be represented as red" };
+					    "Maximal value for energy which will be represented as red" };
   
   Gaudi::Property<double> colorByEnergySaturation{ this, "ColorByEnergySaturation" , 0.8, 
-						  "Hue value that will be used to determine the pallete" };
+						   "Hue value that will be used to determine the pallete" };
   
   
   Gaudi::Property<double> colorByEnergyValue{ this, "ColorByEnergyBrightness" , 0.8, 
-					     "Brigtness value that will be used to determine the pallete" };
+					      "Brigtness value that will be used to determine the pallete" };
 
   
 //===========================================================================================
@@ -138,12 +138,24 @@ struct DrawReconstructedParticles final : k4FWCore::Consumer<void(const edm4hep:
     //Determine the maximal and minimal cluster energy depositions in the event for color scaling (-->when drawing ellipsoids/cylinders).
     double Emin = 99999.; double Emax = 0;
     double pEmin = 99999.; double pEmax = 0;
+
     for (int ip(0); ip < nelem; ++ip) {
       
-	edm4hep::ReconstructedParticle part = col[ ip ] ;
+      edm4hep::ReconstructedParticle thePart = col[ ip ] ;
+      
+      std::vector<edm4hep::ReconstructedParticle> pV ;
+      
+      if( ! thePart.getParticles().empty() ){
+	std::copy( thePart.particles_begin() , thePart.particles_end() , std::back_inserter( pV ) ) ;  
+      }else{
+	pV.push_back( col[ ip ] ) ; 
+      }
 
+      
+      for( auto part : pV ) {
+	
         ClusterVec clusterVec = part.getClusters();
-
+	
         float pene = part.getEnergy();
         pEmin = fmin(pEmin, pene);
         pEmax = fmax(pEmax, pene);
@@ -153,265 +165,287 @@ struct DrawReconstructedParticles final : k4FWCore::Consumer<void(const edm4hep:
 	  Emin = fmin(Emin, e);
 	  Emax = fmax(Emax, e);
         }
+      }
+
     }
+
     for (int ip(0); ip < nelem; ++ip) {
 
       int color = colors.current()[ ip % colors.size() ] ;
 
-      edm4hep::ReconstructedParticle part = col[ ip ] ;
+      edm4hep::ReconstructedParticle thePart = col[ ip ] ;
 
-      TrackVec trackVec = part.getTracks();
-      unsigned nTracks =  (unsigned)trackVec.size();
-      ClusterVec clusterVec = part.getClusters();
-      unsigned nClusters = (unsigned)clusterVec.size();
+      int thePartIndex = myColID + thePart.id().index	; // need to comput the index of the parent particle
 
-      float ene = part.getEnergy();
-      float px  = (float)part.getMomentum()[0];
-      float py  = (float)part.getMomentum()[1];
-      float pz  = (float)part.getMomentum()[2];
-      
-      if( colorByEnergy ){
-	if( colorByEnergyAuto ){
-	  color = ColorMap::NumberToTemperature(ene,pEmin,pEmax,colorByEnergySaturation,colorByEnergyValue);
-	}else{
-	  color = ColorMap::NumberToTemperature(ene,colorByEnergyMin,colorByEnergyMax,colorByEnergySaturation,colorByEnergyValue);
-	}
-      }
-
-      TotEn += ene;
-      TotPX += px;
-      TotPY += py;
-      TotPZ += pz;
-
-      debug()  << "Particle : " << ip
-	       << " PX = " << px
-	       << " PY = " << py
-	       << " PZ = " << pz
-	       << " E  = " << ene << endmsg;
-      
-      for (unsigned icluster=0; icluster<nClusters; ++icluster) {
-	edm4hep::Cluster cluster = clusterVec[icluster];
-	CalorimeterHitVec hitvec = cluster.getHits();
-	int nHits = (int)hitvec.size();
-
-	for (int iHit = 0; iHit < nHits; ++iHit) {
-	  edm4hep::CalorimeterHit hit = hitvec[iHit];
-	  float x = hit.getPosition()[0];
-	  float y = hit.getPosition()[1];
-	  float z = hit.getPosition()[2];
-	  ced_hit_ID(x,y,z,marker, layer ,size,color,  myColID + part.id().index );
-	}
-
-	if( nHits == 0 ) {  // draw large marker at cluster position
-
-	  float x = cluster.getPosition()[0];
-	  float y = cluster.getPosition()[1];
-	  float z = cluster.getPosition()[2];
-
-	  ced_hit_ID(x,y,z,marker, layer, 5*size ,color,  myColID + part.id().index );
-	}
+      std::vector<edm4hep::ReconstructedParticle> pV ;
 	
+      if( ! thePart.getParticles().empty() ){
 
+	std::copy( thePart.particles_begin() , thePart.particles_end() , std::back_inserter( pV ) ) ;  
+
+	debug() << " --- draw particle " << ip << "  with " << pV.size() << " particles  : " << thePart << endmsg ;
+
+      }else{
+	pV.push_back( col[ ip ] ) ; 
       }
 
-      //fg: this code below needs some work: the ellipsoids are flat and they should use the cluster
-      //    shower parameters really, also this should probably be drawn in a different layer ....
-      if( drawEllipsoidForPFOClusters ) {
-	//refactored Cluster drawing as ellipsoids
-	//by Thorben Quast, CERN Summer Student 2015
-	//18 August 2015
-	for (unsigned int p=0; p<nClusters; p++) {
-//	for( auto cluster : col ){ 
-	  //Energy clusters are drawn as ellipsoids.
-	  //For each cluster, it's (energy weighted) central position, the deposited energy and the intrinsic direction in terms of sperical angles are given.
-	  //The minimal and maximal deposited energies among all clusters in the displayed event have been determined previously and will be needed for coloring.
-	  edm4hep::Cluster cluster = clusterVec[p];
-	  double cluster_center[] = {cluster.getPosition()[0], cluster.getPosition()[1], cluster.getPosition()[2]};
-	  double phi = cluster.getPhi();
-	  double theta = cluster.getITheta();
+      for( auto part : pV ) {
 
-	  //Use the direction of the cluster center w.r.t. the origin if no intrinsic angles are given.
-	  if( phi ==0. && theta==0.){
-	    theta = atan( sqrt( cluster_center[0]*cluster_center[0] + cluster_center[1]*cluster_center[1] ) / cluster_center[2]  ) ;
-	    phi = atan2( cluster_center[1] , cluster_center[0] ) ;
+	TrackVec trackVec = part.getTracks();
+	unsigned nTracks =  (unsigned)trackVec.size();
+	ClusterVec clusterVec = part.getClusters();
+	unsigned nClusters = (unsigned)clusterVec.size();
+
+	float ene = part.getEnergy();
+	float px  = (float)part.getMomentum()[0];
+	float py  = (float)part.getMomentum()[1];
+	float pz  = (float)part.getMomentum()[2];
+      
+	if( colorByEnergy ){
+	  if( colorByEnergyAuto ){
+	    color = ColorMap::NumberToTemperature(ene,pEmin,pEmax,colorByEnergySaturation,colorByEnergyValue);
+	  }else{
+	    color = ColorMap::NumberToTemperature(ene,colorByEnergyMin,colorByEnergyMax,colorByEnergySaturation,colorByEnergyValue);
 	  }
+	}
 
-	  //Energy weighted moments of inertia are calculated. Ultimately, the eigenvalues of the 3x3 matrix will be a measure of the ellipsoids' extensions.
+	TotEn += ene;
+	TotPX += px;
+	TotPY += py;
+	TotPZ += pz;
+
+	debug()  << "Particle : " << ip
+		 << " PX = " << px
+		 << " PY = " << py
+		 << " PZ = " << pz
+		 << " E  = " << ene << endmsg;
+      
+	for (unsigned icluster=0; icluster<nClusters; ++icluster) {
+	  edm4hep::Cluster cluster = clusterVec[icluster];
 	  CalorimeterHitVec hitvec = cluster.getHits();
 	  int nHits = (int)hitvec.size();
-	  double Etot = 0;
-	  double I[3][3]; for(int i=0; i<3; i++) for(int j=0; j<3; j++) I[i][j] = 0;
-	  //The angles theta and phi are used to transform the coordinates of each hit into a c.s. in which the x'-axis is parrallel to
-	  //the ellisoid's intrinsic direction. Note that this does not describe an unambigious system as any rotation along the x'-axis does not touch this constraint.
-	  //The transformation is achieved by a typical multiplication of rotation matrices: R(theta, phi) = R_y(Pi/2 - theta)*R_z(phi)
-	  double R[3][3];
-	  R[0][0] = cos(phi) * sin(theta); R[1][0] = -sin(phi); R[2][0] = -cos(phi)*cos(theta); R[0][1] = sin(phi)*sin(theta);
-	  R[1][1] = cos(phi); R[2][1] = -sin(phi)*cos(theta); R[0][2] = cos(theta); R[1][2] = 0; R[2][2] = sin(theta);
-	  double tot_x =0;
-	  double tot_y =0;
-	  double tot_z =0;
-	  for (int q = 0; q < nHits; q++){
-	    edm4hep::CalorimeterHit  hit = hitvec[q];
+
+	  for (int iHit = 0; iHit < nHits; ++iHit) {
+	    edm4hep::CalorimeterHit hit = hitvec[iHit];
 	    float x = hit.getPosition()[0];
 	    float y = hit.getPosition()[1];
 	    float z = hit.getPosition()[2];
-	    float e = hit.getEnergy();
-	    //ced_hit_ID(x,y,z,marker, layer ,size,color,myColID + part.id().index);   //this line draws the indivdual hits within a cluster
-	    //translation and rotation of the coordinates
-	    x -= cluster_center[0];
-	    y -= cluster_center[1];
-	    z -= cluster_center[2];
-	    tot_x += x*e;
-	    tot_y += y*e;
-	    tot_z += z*e;
-	    
-	    double new_x = x * R[0][0] + y * R[0][1] + z * R[0][2];
-	    double new_y = x * R[1][0] + y * R[1][1] + z * R[1][2];
-	    double new_z = x * R[2][0] + y * R[2][1] + z * R[2][2];
-	    x = new_x; y = new_y; z = new_z;
-	    //calculate moments of inertia
-	    I[0][0] += x*x*e; I[1][1] += y*y*e; I[2][2] += z*z*e;
-	    I[0][1] = I[1][0] += x*y*e; I[0][2] = I[2][0] += x*z*e; I[1][2] = I[2][1] += y*z*e;
-	    Etot += e;
+	    ced_hit_ID(x,y,z,marker, layer ,size,color,  thePartIndex );
 	  }
-	  //The result of the rotation by the matrix R, the following coordinates correspond with each other:
-	  //  (component in coordinate system with x' || intrinsic direction)       (system in which ellipsoids are initially placed)
-	  //                          x'                                      <-->        z
-	  //                          y'                                      <-->        y
-	  //                          z'                                      <-->       -x
-	  //These assignments are corrected for by a modified rotation of the ellipsoid along its y-axis (see declaration of double rotate[])
 
-	  double sizes[3];
-	  double alpha =0. ;
-	  if( nHits > 0 ) {
+	  if( nHits == 0 ) {  // draw large marker at cluster position
 
-	    //I is not diagonal yet as only one axis was fixed when applying the rotation R.
-	    //The remaining lengths are determined by the solution of the 2x2 Eigenvalues (p-q formula).
-	    double lambda1 = 0.5*(I[2][2]+I[1][1]) + sqrt( pow(0.5*(I[2][2]+I[1][1]),2 ) + pow(I[2][1],2)-I[2][2]*I[1][1]);
-	    double lambda2 = 0.5*(I[2][2]+I[1][1]) - sqrt( pow(0.5*(I[2][2]+I[1][1]),2 ) + pow(I[2][1],2)-I[2][2]*I[1][1]);
-	    sizes[0] = I[0][0]; sizes[1] = lambda1; sizes[2] = lambda2;
-	    //Remaining: (more or less) Arbitrary rescaling and transformation to a physical length (sqrt + energy division)
-	    for (int i=0; i<3; i++)  sizes[i] = sqrt(17.727)*sqrt(sizes[i])/Etot;
-	    
-	    alpha = 0.5*asin(2*I[1][2]/fabs(lambda1-lambda2)) * (I[1][1]-I[2][2])/fabs(I[1][1]-I[2][2]);
+	    float x = cluster.getPosition()[0];
+	    float y = cluster.getPosition()[1];
+	    float z = cluster.getPosition()[2];
 
-	  } else {
-	  
-	    sizes[0] = 200. ;
-	    sizes[1] = 50. ;
-	    sizes[2] = 50. ;
-	  
+	    ced_hit_ID(x,y,z,marker, layer, 5*size ,color,  thePartIndex );
 	  }
-	  //upside down such that an additional sign is needed.
-	  double rotate[] = {alpha, -(90-theta*180/M_PI), phi*180/M_PI};
+	
 
-	  int ellipsoid_color = color ; //( colorByEnergy ? returnRGBClusterColor(cluster.getEnergy(), Emin, Emax, 256, 'a', 3) : color ) ;
-
-	  debug() << " draw ellipse for cluster : " << cluster.id().index << " - energy : " << cluster.getEnergy() << " size: "
-		  << sizes[0] << ", "
-		  << sizes[1] << ", "
-		  << sizes[2] << " rotate: " 
- 		  << rotate[0] << ", " 
- 		  << rotate[1] << ", " 
- 		  << rotate[2] 
-		  << endmsg ;
-
-          //Draw the ellipsoids, uncommenting the line with cylinders works as well.
-	  ced_ellipsoid_r(sizes, cluster_center, rotate, layer, ellipsoid_color);
-	  //ced_geocylinder_r(0.25*(sizes[0]+sizes[1]), sizes[2], cluster_center, rotate, 36, ellipsoid_color, layer);
 	}
-      }
+
+	//fg: this code below needs some work: the ellipsoids are flat and they should use the cluster
+	//    shower parameters really, also this should probably be drawn in a different layer ....
+	if( drawEllipsoidForPFOClusters ) {
+	  //refactored Cluster drawing as ellipsoids
+	  //by Thorben Quast, CERN Summer Student 2015
+	  //18 August 2015
+	  for (unsigned int p=0; p<nClusters; p++) {
+//	for( auto cluster : col ){ 
+	    //Energy clusters are drawn as ellipsoids.
+	    //For each cluster, it's (energy weighted) central position, the deposited energy and the intrinsic direction in terms of sperical angles are given.
+	    //The minimal and maximal deposited energies among all clusters in the displayed event have been determined previously and will be needed for coloring.
+	    edm4hep::Cluster cluster = clusterVec[p];
+	    double cluster_center[] = {cluster.getPosition()[0], cluster.getPosition()[1], cluster.getPosition()[2]};
+	    double phi = cluster.getPhi();
+	    double theta = cluster.getITheta();
+
+	    //Use the direction of the cluster center w.r.t. the origin if no intrinsic angles are given.
+	    if( phi ==0. && theta==0.){
+	      theta = atan( sqrt( cluster_center[0]*cluster_center[0] + cluster_center[1]*cluster_center[1] ) / cluster_center[2]  ) ;
+	      phi = atan2( cluster_center[1] , cluster_center[0] ) ;
+	    }
+
+	    //Energy weighted moments of inertia are calculated. Ultimately, the eigenvalues of the 3x3 matrix will be a measure of the ellipsoids' extensions.
+	    CalorimeterHitVec hitvec = cluster.getHits();
+	    int nHits = (int)hitvec.size();
+	    double Etot = 0;
+	    double I[3][3]; for(int i=0; i<3; i++) for(int j=0; j<3; j++) I[i][j] = 0;
+	    //The angles theta and phi are used to transform the coordinates of each hit into a c.s. in which the x'-axis is parrallel to
+	    //the ellisoid's intrinsic direction. Note that this does not describe an unambigious system as any rotation along the x'-axis does not touch this constraint.
+	    //The transformation is achieved by a typical multiplication of rotation matrices: R(theta, phi) = R_y(Pi/2 - theta)*R_z(phi)
+	    double R[3][3];
+	    R[0][0] = cos(phi) * sin(theta); R[1][0] = -sin(phi); R[2][0] = -cos(phi)*cos(theta); R[0][1] = sin(phi)*sin(theta);
+	    R[1][1] = cos(phi); R[2][1] = -sin(phi)*cos(theta); R[0][2] = cos(theta); R[1][2] = 0; R[2][2] = sin(theta);
+	    double tot_x =0;
+	    double tot_y =0;
+	    double tot_z =0;
+	    for (int q = 0; q < nHits; q++){
+	      edm4hep::CalorimeterHit  hit = hitvec[q];
+	      float x = hit.getPosition()[0];
+	      float y = hit.getPosition()[1];
+	      float z = hit.getPosition()[2];
+	      float e = hit.getEnergy();
+	      //ced_hit_ID(x,y,z,marker, layer ,size,color,thePartIndex);   //this line draws the indivdual hits within a cluster
+	      //translation and rotation of the coordinates
+	      x -= cluster_center[0];
+	      y -= cluster_center[1];
+	      z -= cluster_center[2];
+	      tot_x += x*e;
+	      tot_y += y*e;
+	      tot_z += z*e;
+	    
+	      double new_x = x * R[0][0] + y * R[0][1] + z * R[0][2];
+	      double new_y = x * R[1][0] + y * R[1][1] + z * R[1][2];
+	      double new_z = x * R[2][0] + y * R[2][1] + z * R[2][2];
+	      x = new_x; y = new_y; z = new_z;
+	      //calculate moments of inertia
+	      I[0][0] += x*x*e; I[1][1] += y*y*e; I[2][2] += z*z*e;
+	      I[0][1] = I[1][0] += x*y*e; I[0][2] = I[2][0] += x*z*e; I[1][2] = I[2][1] += y*z*e;
+	      Etot += e;
+	    }
+	    //The result of the rotation by the matrix R, the following coordinates correspond with each other:
+	    //  (component in coordinate system with x' || intrinsic direction)       (system in which ellipsoids are initially placed)
+	    //                          x'                                      <-->        z
+	    //                          y'                                      <-->        y
+	    //                          z'                                      <-->       -x
+	    //These assignments are corrected for by a modified rotation of the ellipsoid along its y-axis (see declaration of double rotate[])
+
+	    double sizes[3];
+	    double alpha =0. ;
+	    if( nHits > 0 ) {
+
+	      //I is not diagonal yet as only one axis was fixed when applying the rotation R.
+	      //The remaining lengths are determined by the solution of the 2x2 Eigenvalues (p-q formula).
+	      double lambda1 = 0.5*(I[2][2]+I[1][1]) + sqrt( pow(0.5*(I[2][2]+I[1][1]),2 ) + pow(I[2][1],2)-I[2][2]*I[1][1]);
+	      double lambda2 = 0.5*(I[2][2]+I[1][1]) - sqrt( pow(0.5*(I[2][2]+I[1][1]),2 ) + pow(I[2][1],2)-I[2][2]*I[1][1]);
+	      sizes[0] = I[0][0]; sizes[1] = lambda1; sizes[2] = lambda2;
+	      //Remaining: (more or less) Arbitrary rescaling and transformation to a physical length (sqrt + energy division)
+	      for (int i=0; i<3; i++)  sizes[i] = sqrt(17.727)*sqrt(sizes[i])/Etot;
+	    
+	      alpha = 0.5*asin(2*I[1][2]/fabs(lambda1-lambda2)) * (I[1][1]-I[2][2])/fabs(I[1][1]-I[2][2]);
+
+	    } else {
+	  
+	      sizes[0] = 200. ;
+	      sizes[1] = 50. ;
+	      sizes[2] = 50. ;
+	  
+	    }
+	    //upside down such that an additional sign is needed.
+	    double rotate[] = {alpha, -(90-theta*180/M_PI), phi*180/M_PI};
+
+	    int ellipsoid_color = color ; //( colorByEnergy ? returnRGBClusterColor(cluster.getEnergy(), Emin, Emax, 256, 'a', 3) : color ) ;
+
+	    debug() << " draw ellipse for cluster : " << cluster.id().index << " - energy : " << cluster.getEnergy() << " size: "
+		    << sizes[0] << ", "
+		    << sizes[1] << ", "
+		    << sizes[2] << " rotate: " 
+		    << rotate[0] << ", " 
+		    << rotate[1] << ", " 
+		    << rotate[2] 
+		    << endmsg ;
+
+	    //Draw the ellipsoids, uncommenting the line with cylinders works as well.
+	    ced_ellipsoid_r(sizes, cluster_center, rotate, layer, ellipsoid_color);
+	    //ced_geocylinder_r(0.25*(sizes[0]+sizes[1]), sizes[2], cluster_center, rotate, 36, ellipsoid_color, layer);
+	  }
+	}
     
       
-      //************
-      for (unsigned itrack=0; itrack<nTracks; ++itrack) {
-	edm4hep::Track trk = trackVec[itrack];
+	//************
+	for (unsigned itrack=0; itrack<nTracks; ++itrack) {
+	  edm4hep::Track trk = trackVec[itrack];
 	
-	// -- collect hits from all track segments
-	TrackerHitVec tHV ;
+	  // -- collect hits from all track segments
+	  TrackerHitVec tHV ;
 
-	debug() << " -- track has "<< trk.getTracks().size()
-		<< " subtracks - will use these for displaying hits "
-		<< std::endl ;
+	  debug() << " -- track has "<< trk.getTracks().size()
+		  << " subtracks - will use these for displaying hits "
+		  << std::endl ;
 	    
-	std::copy( trk.getTrackerHits().begin() , trk.getTrackerHits().end() , std::back_inserter(  tHV ) ) ;
-	for( unsigned j=0 ,N = trk.getTracks().size() ; j<N ; ++j ){
+	  std::copy( trk.getTrackerHits().begin() , trk.getTrackerHits().end() , std::back_inserter(  tHV ) ) ;
+	  for( unsigned j=0 ,N = trk.getTracks().size() ; j<N ; ++j ){
 	      
-	  auto t = trk.getTracks()[j] ;
-	  debug() << " -- track j= "<< j << " has " <<  t.getTrackerHits().size()
-		  << " hits  " << std::endl ;
+	    auto t = trk.getTracks()[j] ;
+	    debug() << " -- track j= "<< j << " has " <<  t.getTrackerHits().size()
+		    << " hits  " << std::endl ;
 	      
-	  std::copy( t.getTrackerHits().begin() , t.getTrackerHits().end() , std::back_inserter(  tHV ) ) ;
-	}
+	    std::copy( t.getTrackerHits().begin() , t.getTrackerHits().end() , std::back_inserter(  tHV ) ) ;
+	  }
 	    
-	int nHits = (int)tHV.size();
-	for (int iHit = 0; iHit < nHits; ++iHit) {
-	  edm4hep::TrackerHit hit = tHV[iHit];
-	  float x = (float)hit.getPosition()[0];
-	  float y = (float)hit.getPosition()[1];
-	  float z = (float)hit.getPosition()[2];
-	  ced_hit_ID(x,y,z,marker, layer,size,color, myColID + part.id().index);
-	}
+	  int nHits = (int)tHV.size();
+	  for (int iHit = 0; iHit < nHits; ++iHit) {
+	    edm4hep::TrackerHit hit = tHV[iHit];
+	    float x = (float)hit.getPosition()[0];
+	    float y = (float)hit.getPosition()[1];
+	    float z = (float)hit.getPosition()[2];
+	    ced_hit_ID(x,y,z,marker, layer,size,color, thePartIndex );
+	  }
 	    
-	if((nHits==0 || drawHelixForPFOs ) && std::fabs(part.getCharge())>0.001){
+	  if((nHits==0 || drawHelixForPFOs ) && std::fabs(part.getCharge())>0.001){
 
-	  auto ts = getTrackStateAt( trk, edm4hep::TrackState::AtIP ) ;
+	    auto ts = getTrackStateAt( trk, edm4hep::TrackState::AtIP ) ;
 
-	  if( ts.omega != 0. ){
-	    double* bFieldVector = new double[3];
-	    theDetector.field().combinedMagnetic( dd4hep::Position(0,0,0), bFieldVector) ;
-	    double bField = bFieldVector[2] / dd4hep::tesla;
-	    delete[] bFieldVector;
-	    double pt;
-	    if (bField != 0.0 && std::abs(ts.omega) > 0.00001 ){
-	      pt = bField * 3e-4 / std::abs( ts.omega ) ;
-	    }else{
-	      pt = 1.e10;
+	    if( ts.omega != 0. ){
+	      double* bFieldVector = new double[3];
+	      theDetector.field().combinedMagnetic( dd4hep::Position(0,0,0), bFieldVector) ;
+	      double bField = bFieldVector[2] / dd4hep::tesla;
+	      delete[] bFieldVector;
+	      double pt;
+	      if (bField != 0.0 && std::abs(ts.omega) > 0.00001 ){
+		pt = bField * 3e-4 / std::abs( ts.omega ) ;
+	      }else{
+		pt = 1.e10;
+	      }
+	      double charge = ( ts.omega > 0. ?  1. : -1. ) ;
+	      double Px = pt * std::cos(  ts.phi ) ;
+	      double Py = pt * std::sin(  ts.phi ) ;
+	      double Pz = pt * ts.tanLambda ;
+
+	      // start point for drawing ( PCA to reference point )
+	      double Xs = ts.referencePoint[0] -  ts.D0 * sin( ts.phi ) ;
+	      double Ys = ts.referencePoint[1] +  ts.D0 * cos( ts.phi ) ;
+	      double Zs = ts.referencePoint[2] +  ts.Z0 ;
+
+	      int helixColor = ( useColorForHelixTracks ? color : 0xdddddd ) ;
+
+	      k4GaudiCED::drawHelix(bField, charge, Xs, Ys, Zs, Px, Py, Pz,
+				    marker|(layer<<CED_LAYER_SHIFT),   // fixme - is this correct ???
+				    size,
+				    helixColor, 0.0, _helix_max_r, _helix_max_z,
+				    thePartIndex );
 	    }
-	    double charge = ( ts.omega > 0. ?  1. : -1. ) ;
-	    double Px = pt * std::cos(  ts.phi ) ;
-	    double Py = pt * std::sin(  ts.phi ) ;
-	    double Pz = pt * ts.tanLambda ;
-
-	    // start point for drawing ( PCA to reference point )
-	    double Xs = ts.referencePoint[0] -  ts.D0 * sin( ts.phi ) ;
-	    double Ys = ts.referencePoint[1] +  ts.D0 * cos( ts.phi ) ;
-	    double Zs = ts.referencePoint[2] +  ts.Z0 ;
-
-	    int helixColor = ( useColorForHelixTracks ? color : 0xdddddd ) ;
-
-	    k4GaudiCED::drawHelix(bField, charge, Xs, Ys, Zs, Px, Py, Pz,
-				  marker|(layer<<CED_LAYER_SHIFT),   // fixme - is this correct ???
-				  size,
-				  helixColor, 0.0, _helix_max_r, _helix_max_z,
-				  myColID + part.id().index );
 	  }
 	}
       }
     }
 
+    
+      
     k4GaudiCED::draw(this, 1 );
   }
 
 
- int returnRGBClusterColor(float eneCluster, float cutoff_min, float cutoff_max, int color_steps, char scale, int colorMap) const {
+  int returnRGBClusterColor(float eneCluster, float cutoff_min, float cutoff_max, int color_steps, char scale, int colorMap) const {
     int color = 0x000000; //default colour: black
     int color_delta = 0; //colour step in the [0, color_steps] spectrum
     unsigned int rgb[] = {0, 0, 0}; //array of RGB to be returned as one 0x000000 HEX value
 
     /**
-    * Check the input values for sanity */
+     * Check the input values for sanity */
     if (cutoff_min > cutoff_max) {
-        std::cout << "Error in 'DSTViewer::returnRGBClusterColor': cutoff_min < cutoff_max" << std::endl;
+      std::cout << "Error in 'DSTViewer::returnRGBClusterColor': cutoff_min < cutoff_max" << std::endl;
     }
     if (eneCluster < 0.0) {
-        std::cout << "Error in 'DSTViewer::returnRGBClusterColor': eneCluster is negative!" << std::endl;
+      std::cout << "Error in 'DSTViewer::returnRGBClusterColor': eneCluster is negative!" << std::endl;
     }
     if (cutoff_min < 0.0) {
-        std::cout << "Error in 'DSTViewer::returnRGBClusterColor': eneCluster is negative!" << std::endl;
+      std::cout << "Error in 'DSTViewer::returnRGBClusterColor': eneCluster is negative!" << std::endl;
     }
     if (colorMap < 0 || colorMap > 6) {
-        std::cout << "Error in 'DSTViewer::returnRGBClusterColor': wrong colorMap param!" << std::endl;
+      std::cout << "Error in 'DSTViewer::returnRGBClusterColor': wrong colorMap param!" << std::endl;
     }
     // Input values in log-scale
     float log_ene = std::log(eneCluster+1);
@@ -421,27 +455,27 @@ struct DrawReconstructedParticles final : k4FWCore::Consumer<void(const edm4hep:
     float log_step = log_delta/(float)color_steps;
 
     switch(scale){
-        case 'a': default: //log
-            color_delta = (int) ((log_ene-log_min)/log_step); // which colour bin does the value go to? We have [0x00,0xFF] bins
-            break;
-        case 'b': //linear
-            color_delta = (int)((eneCluster - cutoff_min)/(cutoff_max - cutoff_min)*color_steps);
-            break;
+    case 'a': default: //log
+      color_delta = (int) ((log_ene-log_min)/log_step); // which colour bin does the value go to? We have [0x00,0xFF] bins
+      break;
+    case 'b': //linear
+      color_delta = (int)((eneCluster - cutoff_min)/(cutoff_max - cutoff_min)*color_steps);
+      break;
     }
 
 
     if (color_delta >= color_steps){
-        color_delta = color_steps;
+      color_delta = color_steps;
     }
     if (color_delta < 0){
-        color_delta = 0;
+      color_delta = 0;
     }
 
     ColorMap::selectColorMap(colorMap)(rgb, color_delta, 0, color_steps);
     color = ColorMap::RGB2HEX(rgb[0],rgb[1],rgb[2]);
 
     return color;
-} 
+  } 
 
 
 

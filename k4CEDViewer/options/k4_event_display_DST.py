@@ -77,6 +77,8 @@ algList.append( DrawReconstructedParticles("draw_pfos", colName = "PandoraPFOs",
                                            useColorForHelixTracks=1, ColorByEnergy=False, ColorByEnergyAuto=True, DrawEllipsoidForPFOClusters=True) )
 
 
+algList.append( DrawReconstructedParticles("draw_pi0s", colName = "GammaGammaCandidatePi0s", drawHelixForPFOs=1 , size=3, marker=2, layer=4,
+                                           useColorForHelixTracks=1, colorScheme=12 , DrawEllipsoidForPFOClusters=True) )
 
 
 
