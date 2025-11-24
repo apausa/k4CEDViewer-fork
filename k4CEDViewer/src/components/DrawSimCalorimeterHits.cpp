@@ -65,8 +65,6 @@ struct DrawSimCalorimeterHits final
 
     info() << endmsg;
 
-    dd4hep::Detector& theDetector = dd4hep::Detector::getInstance();
-
     Colors colors(colorScheme);
 
     //-----------------------

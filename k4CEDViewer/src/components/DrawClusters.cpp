@@ -87,8 +87,6 @@ struct DrawClusters final : k4FWCore::Consumer<void(const edm4hep::ClusterCollec
     printfun f = PrintEDM4hep<edm4hep::ClusterCollection>(col);
     PickingHandler::instance().registerFunctor(myColID / IDFactor, f);
 
-    dd4hep::Detector& theDetector = dd4hep::Detector::getInstance();
-
     Colors colors(colorScheme);
 
     //------------------------
@@ -165,8 +163,7 @@ struct DrawClusters final : k4FWCore::Consumer<void(const edm4hep::ClusterCollec
 
         // Energy weighted moments of inertia are calculated. Ultimately, the eigenvalues of the 3x3 matrix will be a
         // measure of the ellipsoids' extensions.
-        CalorimeterHitVec hitvec = cluster.getHits();
-        int nHits = (int)hitvec.size();
+
         double Etot = 0;
         double I[3][3];
         for (int i = 0; i < 3; i++)

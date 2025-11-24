@@ -28,6 +28,9 @@ set(PACKAGE_VERSION_PATCH 0)
 
 set(PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_PATCH}")
 
+
+set(CMAKE_CXX_FLAGS="-Wno-psabi")
+
 # dependencies are declared like this
 find_package(Gaudi)
 find_package(ROOT COMPONENTS RIO Tree)
