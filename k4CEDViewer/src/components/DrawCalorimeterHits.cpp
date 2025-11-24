@@ -17,83 +17,72 @@
  * limitations under the License.
  */
 
-
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/MCParticle.h"
+#include "k4CEDColors.h"
 #include "k4FWCore/Consumer.h"
 #include "k4GaudiCED.h"
 #include "k4GaudiCEDUtils.h"
-#include "k4CEDColors.h"
 
 #include "DD4hep/DetType.h"
 
 #include <string>
 
+using namespace k4ced;
 
-
-using namespace k4ced ;
-
-
-struct DrawCalorimeterHits final : k4FWCore::Consumer<void(const std::vector<const edm4hep::CalorimeterHitCollection*>&)> {
+struct DrawCalorimeterHits final
+    : k4FWCore::Consumer<void(const std::vector<const edm4hep::CalorimeterHitCollection*>&)> {
   DrawCalorimeterHits(const std::string& name, ISvcLocator* svcLoc)
-    : Consumer(name, svcLoc,  KeyValues("colNames", {{"TPCCollection"}}) ) {
+      : Consumer(name, svcLoc, KeyValues("colNames", {{"TPCCollection"}})) {
 
-    k4GaudiCED::init(this) ;
+    k4GaudiCED::init(this);
   }
 
-  
-  Gaudi::Property<int> layer{ this, "layer" , 12 , "layer to draw CalorimeterHits " };
-  Gaudi::Property<int> size{  this, "size"  , 2 , "size for drawning  CalorimeterHits " };
-  Gaudi::Property<int> marker{  this, "marker"  , 0 , "marker for drawning  CalorimeterHits " };
-  Gaudi::Property<int> color{  this, "color"  , 0xee0000 , "color for drawning  CalorimeterHits (default: 0xee0000)" };
+  Gaudi::Property<int> layer{this, "layer", 12, "layer to draw CalorimeterHits "};
+  Gaudi::Property<int> size{this, "size", 2, "size for drawning  CalorimeterHits "};
+  Gaudi::Property<int> marker{this, "marker", 0, "marker for drawning  CalorimeterHits "};
+  Gaudi::Property<int> color{this, "color", 0xee0000, "color for drawning  CalorimeterHits (default: 0xee0000)"};
 
-  
-//===========================================================================================
+  //===========================================================================================
 
   void operator()(const std::vector<const edm4hep::CalorimeterHitCollection*>& collections) const override {
-    
 
+    k4ced::GlobalLog::instance().level() = msgSvc()->outputLevel();
+    k4ced::GlobalLog::instance().name() = name();
 
-    k4ced::GlobalLog::instance().level()  = msgSvc()->outputLevel() ;
-    k4ced::GlobalLog::instance().name()   = name() ;
-    
-    k4GaudiCED::newEvent(this) ;
+    k4GaudiCED::newEvent(this);
 
-    std::stringstream sstr ;
-    info()  <<  " +++++++  drawing CalorimeterHits from collections: \n" ;
-    for(unsigned i=0 ; i< inputLocations(0).size() ; ++i){
+    std::stringstream sstr;
+    info() << " +++++++  drawing CalorimeterHits from collections: \n";
+    for (unsigned i = 0; i < inputLocations(0).size(); ++i) {
 
-      sstr <<  inputLocations(0)[i] << ", " ;
-      info() << "    " << inputLocations(0)[i] << "\n" ; 
+      sstr << inputLocations(0)[i] << ", ";
+      info() << "    " << inputLocations(0)[i] << "\n";
     }
 
-    info() << endmsg ;
+    info() << endmsg;
 
     //-----------------------
 
-    k4GaudiCED::add_layer_description( sstr.str(), layer);
+    k4GaudiCED::add_layer_description(sstr.str(), layer);
 
-    for( const auto* col : collections ) {
+    for (const auto* col : collections) {
 
-      unsigned myColID = PickingHandler::instance().colID() * k4ced::IDFactor ;
-      printfun f =  PrintEDM4hep<edm4hep::CalorimeterHitCollection>( *col )  ;
-      PickingHandler::instance().registerFunctor( myColID/IDFactor , f ) ;
-      
-      for( int i=0, n=col->size(); i<n ; i++ ){
-	
-	auto h = col->at(i) ;
+      unsigned myColID = PickingHandler::instance().colID() * k4ced::IDFactor;
+      printfun f = PrintEDM4hep<edm4hep::CalorimeterHitCollection>(*col);
+      PickingHandler::instance().registerFunctor(myColID / IDFactor, f);
 
-	int id =  myColID + h.id().index ;
-	  
-	  ced_hit_ID( h.getPosition()[0],
-		      h.getPosition()[1],
-		      h.getPosition()[2],
-		      marker,layer, size , color, id ) ;
+      for (int i = 0, n = col->size(); i < n; i++) {
+
+        auto h = col->at(i);
+
+        int id = myColID + h.id().index;
+
+        ced_hit_ID(h.getPosition()[0], h.getPosition()[1], h.getPosition()[2], marker, layer, size, color, id);
       }
     }
-    k4GaudiCED::draw(this, 1 );
+    k4GaudiCED::draw(this, 1);
   }
-
 };
 
 DECLARE_COMPONENT(DrawCalorimeterHits)

@@ -17,62 +17,50 @@
  * limitations under the License.
  */
 
-
 #include "edm4hep/MCParticleCollection.h"
 #include "k4FWCore/Consumer.h"
 #include "k4GaudiCED.h"
 #include "k4GaudiCEDUtils.h"
 
-
 #include "DD4hep/DetType.h"
 
-using namespace k4ced ;
+using namespace k4ced;
 
 #include <string>
 
 struct DrawDetector final : k4FWCore::Consumer<void(const edm4hep::MCParticleCollection&)> {
   DrawDetector(const std::string& name, ISvcLocator* svcLoc)
-    : Consumer(name, svcLoc,  KeyValue("colName", {"MCParticles"}) ) {
+      : Consumer(name, svcLoc, KeyValue("colName", {"MCParticles"})) {
 
-    k4GaudiCED::init(this) ;
+    k4GaudiCED::init(this);
   }
 
-  Gaudi::Property<bool> drawSurfaces{  this, "drawSurfaces"  , false , " draw detector surfaces if available" };
-  Gaudi::Property<std::vector<std::string>> drawDetailed{  this, "drawDetailed"  , {} , " draw these detectors with more details (e.g. staves" };
+  Gaudi::Property<bool> drawSurfaces{this, "drawSurfaces", false, " draw detector surfaces if available"};
+  Gaudi::Property<std::vector<std::string>> drawDetailed{
+      this, "drawDetailed", {}, " draw these detectors with more details (e.g. staves"};
 
-  
-//===========================================================================================
+  //===========================================================================================
 
-  void operator()(const edm4hep::MCParticleCollection& ) const override {
+  void operator()(const edm4hep::MCParticleCollection&) const override {
 
+    k4ced::GlobalLog::instance().level() = msgSvc()->outputLevel();
+    k4ced::GlobalLog::instance().name() = name();
 
+    k4GaudiCED::newEvent(this);
 
-    k4ced::GlobalLog::instance().level()  = msgSvc()->outputLevel() ;
-    k4ced::GlobalLog::instance().name()   = name() ;
-    
-    k4GaudiCED::newEvent(this) ;
+    info() << " +++++++  drawing the detector  "
+           << " outputLevel = " << k4ced::GlobalLog::instance().level() << endmsg;
 
-
-    info()  <<  " +++++++  drawing the detector  "
-	    << " outputLevel = " <<   k4ced::GlobalLog::instance().level()
-	    << endmsg ;
-
-
-    dd4hep::Detector& theDetector = dd4hep::Detector::getInstance();   
+    dd4hep::Detector& theDetector = dd4hep::Detector::getInstance();
 
     //------------------------
 
-    k4GaudiCED::drawDD4hepDetector(theDetector, drawSurfaces, drawDetailed ) ;
+    k4GaudiCED::drawDD4hepDetector(theDetector, drawSurfaces, drawDetailed);
 
     //------------------------
 
-    
-    k4GaudiCED::draw(this, 1 );
+    k4GaudiCED::draw(this, 1);
   }
-
-
-
-
 };
 
 DECLARE_COMPONENT(DrawDetector)
