@@ -77,6 +77,7 @@ algList.append( DrawClusters("draw_clus", colName = "PandoraClusters", ColorByEn
 
 algList.append( DrawReconstructedParticles("draw_pfos", colName = "PandoraPFOs", drawHelixForPFOs=0, DrawEllipsoidForPFOClusters=False ) )
 
+
 # --- test ellipses (for DSTs)
 ##algList.append( DrawReconstructedParticles("draw_pfos", colName = "PandoraPFOs", drawHelixForPFOs=0, ColorByEnergy=True, ColorByEnergyAuto=True, DrawEllipsoidForPFOClusters=True ) )
 
@@ -96,16 +97,16 @@ algList.append(
     DrawSimCalorimeterHits("draw_simchs",
                            colNames = [
                                "ECalBarrelSiHitsEven",
-                               "ECalBarrelSiHitsOdd",  
+                               "ECalBarrelSiHitsOdd",
                                "EcalEndcapRingCollection",
                                "ECalEndcapSiHitsEven",
-                               "ECalEndcapSiHitsOdd",  
-                               "HcalBarrelRegCollection", 
+                               "ECalEndcapSiHitsOdd",
+                               "HcalBarrelRegCollection",
                                "HcalEndcapRingCollection",
                                "HcalEndcapsCollection",
-                               "LumiCalCollection", 
-                               "YokeBarrelCollection",    
-                               "YokeEndcapsCollection",  
+                               "LumiCalCollection",
+                               "YokeBarrelCollection",
+                               "YokeEndcapsCollection",
                            ] , layer=2 , size=2 ) )
 
 algList.append(
@@ -116,9 +117,9 @@ algList.append(
                             "EcalEndcapRingCollectionRec",
                             "EcalEndcapsCollectionGapHits",
                             "EcalEndcapsCollectionRec",
-                            "HcalBarrelCollectionRec", 
+                            "HcalBarrelCollectionRec",
                             "HcalEndcapRingCollectionRec",
-                            "HcalEndcapsCollectionRec",  
+                            "HcalEndcapsCollectionRec",
                             "LCAL",
                             "MUON"
                         ] , layer=12 , size=4 ) )

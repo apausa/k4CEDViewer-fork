@@ -20,7 +20,7 @@ limitations under the License.
 file(GLOB _plugin_sources src/components/*.cpp)
 
 #find_package(DD4hep REQUIRED)
- 
+
 
 FIND_PACKAGE( MarlinUtil 1.2 REQUIRED )
 FIND_PACKAGE( CED REQUIRED )
@@ -32,7 +32,7 @@ FOREACH( pkg  MarlinUtil CED)
         ADD_DEFINITIONS ( ${${pkg}_DEFINITIONS} )
     ENDIF()
 ENDFOREACH()
-	       
+
 Gaudi_add_module(k4CEDViewerPlugins
                  SOURCES ${_plugin_sources}
                  LINK Gaudi::GaudiKernel
