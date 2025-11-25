@@ -77,15 +77,15 @@ algList.append( DrawTracks("draw_trks", colName = "MarlinTrkTracks" , marker=0, 
 algList.append( DrawClusters("draw_clus", colName = "PandoraClusters", ColorByEnergyAuto=True, DrawEllipsoidForPFOClusters=True ) )
 
 algList.append( DrawReconstructedParticles("draw_pfos", colName = "PandoraPFOs", drawHelixForPFOs=1 , size=3, marker=3,
-                                           useColorForHelixTracks=1, ColorByEnergy=False, ColorByEnergyAuto=True, DrawEllipsoidForPFOClusters=True) )
+                                           useColorForHelixTracks=1, colorScheme=4, ColorByEnergy=False, ColorByEnergyAuto=True, DrawEllipsoidForPFOClusters=True) )
 
 
-algList.append( DrawReconstructedParticles("draw_pi0s", colName = "GammaGammaCandidatePi0s", drawHelixForPFOs=1 , size=3, marker=2, layer=4,
-                                           useColorForHelixTracks=1, colorScheme=12 , DrawEllipsoidForPFOClusters=True) )
+#algList.append( DrawReconstructedParticles("draw_pi0s", colName = "GammaGammaCandidatePi0s", drawHelixForPFOs=1 , size=3, marker=2, layer=3,
+#                                           useColorForHelixTracks=1, colorScheme=4 , DrawEllipsoidForPFOClusters=True) )
 
 
 
-algList.append( DrawJets("draw_jets", colName = "Refined4Jets" ) )
+algList.append( DrawJets("draw_jets", colName = "Refined4Jets" , layer=4) )
 
 
 
