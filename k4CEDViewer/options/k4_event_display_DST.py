@@ -27,6 +27,7 @@ from Configurables import (GeoSvc,
                            DrawTracks,
                            DrawClusters,
                            DrawReconstructedParticles,
+                           DrawJets,
                            DrawSimTrackerHits,
                            DrawTrackerHits,
                            DrawSimCalorimeterHits,
@@ -67,6 +68,8 @@ algList.append(  DrawDetector("draw_detector", drawSurfaces=False , colName= "MC
 
 #algList.append(  DrawDetector("draw_detector", drawSurfaces=True, drawDetailed=["SiliconTrackerBarrel","SiliconTrackerEndcap"] ) )
 
+
+
 algList.append( DrawMCParticles("draw_mcps", colName = "MCParticlesSkimmed" , layer=0 , size=3 ) )
 
 algList.append( DrawTracks("draw_trks", colName = "MarlinTrkTracks" , marker=0, layer=5 , size=3, drawHelixForTracks=1 , colorScheme=7) )
@@ -79,6 +82,12 @@ algList.append( DrawReconstructedParticles("draw_pfos", colName = "PandoraPFOs",
 
 algList.append( DrawReconstructedParticles("draw_pi0s", colName = "GammaGammaCandidatePi0s", drawHelixForPFOs=1 , size=3, marker=2, layer=4,
                                            useColorForHelixTracks=1, colorScheme=12 , DrawEllipsoidForPFOClusters=True) )
+
+
+
+algList.append( DrawJets("draw_jets", colName = "Refined4Jets" ) )
+
+
 
 
 

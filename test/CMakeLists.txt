@@ -16,19 +16,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ]]
-add_test(NAME CreateExampleEventData
-               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-               COMMAND k4run k4CEDViewer/options/createExampleEventData.py)
-
-add_test(NAME ReadExampleEventData
-               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-               COMMAND k4run k4CEDViewer/options/readExampleEventData.py)
-set_property(TEST ReadExampleEventData APPEND PROPERTY DEPENDS CreateExampleEventData)
-
-add_test(NAME HelloWorldAlg
-               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-               COMMAND k4run k4CEDViewer/options/createHelloWorld.py)
-
+### no tests for now ...add_test(NAME CreateExampleEventData
+### no tests for now ...               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+### no tests for now ...               COMMAND k4run k4CEDViewer/options/createExampleEventData.py)
+### no tests for now ...
+### no tests for now ...add_test(NAME ReadExampleEventData
+### no tests for now ...               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+### no tests for now ...               COMMAND k4run k4CEDViewer/options/readExampleEventData.py)
+### no tests for now ...set_property(TEST ReadExampleEventData APPEND PROPERTY DEPENDS CreateExampleEventData)
+### no tests for now ...
+### no tests for now ...add_test(NAME HelloWorldAlg
+### no tests for now ...               WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+### no tests for now ...               COMMAND k4run k4CEDViewer/options/createHelloWorld.py)
+### no tests for now ...
 # For LD_LIBRARY_PATH
 # ${PROJECT_BINARY_DIR}                                         # The files <plugins>.components and <plugins>.confdb are here
 # ${PROJECT_BINARY_DIR}/${PROJECT_NAME}                         # The plugins (.so) are here

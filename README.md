@@ -29,6 +29,12 @@ cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
 ninja install
 ```
 
+On arm architectures, e.g. MacOS you can supress warning wrt a subtle abi change in std:pair in DD4hep with
+```
+cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_FLAGS="-Wno-psabi" -G Ninja
+```
+
+
 Alternatively you can source the nightlies instead of the releases:
 
 ``` bash
