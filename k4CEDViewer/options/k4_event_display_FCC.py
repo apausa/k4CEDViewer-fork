@@ -80,20 +80,20 @@ algList.append(DrawSimCalorimeterHits(
 )
 
 # edm4hep::CalorimeterHitCollection
-algList.append(DrawCalorimeterHits("draw_chs", colNames = ["CalorimeterHits"], layer=12, size=4) )
+# algList.append(DrawCalorimeterHits("draw_chs", colNames = ["CalorimeterHits"], layer=12, size=4) )
 
 # edm4hep::ClusterCollection
-algList.append( DrawClusters("draw_clus_neutralhadron", colName="EFlowNeutralHadron", layer=3))
-algList.append( DrawClusters("draw_clus_photon", colName="EFlowPhoton", layer=3))
+# algList.append(DrawClusters("draw_clus_neutralhadron", colName="EFlowNeutralHadron", layer=3))
+# algList.append(DrawClusters("draw_clus_photon", colName="EFlowPhoton", layer=3))
 
 # edm4hep::ReconstructedParticleCollection
-algList.append(DrawReconstructedParticles("draw_pfos_electron", colName="Electron", drawHelixForPFOs=0))
-algList.append(DrawReconstructedParticles("draw_pfos_muon", colName="Muon", drawHelixForPFOs=0))
-algList.append(DrawReconstructedParticles("draw_pfos_photon", colName="Photon", drawHelixForPFOs=0))
-algList.append(DrawReconstructedParticles("draw_pfos_reco", colName="ReconstructedParticles", drawHelixForPFOs=0))
+# algList.append(DrawReconstructedParticles("draw_pfos_electron", colName="Electron", drawHelixForPFOs=0))
+# algList.append(DrawReconstructedParticles("draw_pfos_muon", colName="Muon", drawHelixForPFOs=0))
+# algList.append(DrawReconstructedParticles("draw_pfos_photon", colName="Photon", drawHelixForPFOs=0))
+# algList.append(DrawReconstructedParticles("draw_pfos_reco", colName="ReconstructedParticles", drawHelixForPFOs=0))
 
 # edm4hep::ReconstructedParticleCollection (jets)
-algList.append(DrawJets("draw_jets", colName="Jet", layer=4))
+# algList.append(DrawJets("draw_jets", colName="Jet", layer=4))
 
 # edm4hep::SimTrackerHitCollection
 algList.append(DrawSimTrackerHits(
@@ -111,24 +111,24 @@ algList.append(DrawSimTrackerHits(
 ))
 
 # edm4hep::TrackerHit3DCollection
-algList.append(DrawTrackerHits(
-  "draw_ths",
-  colNamesTH3D = ["TrackerHits"],
-  colNamesTHPlane = [],
-  layer=11,
-  size=4
-))
+# algList.append(DrawTrackerHits(
+#  "draw_ths",
+#  colNamesTH3D = ["TrackerHits"],
+#  colNamesTHPlane = [],
+#  layer=11,
+#  size=4
+# ))
 
 # edm4hep::TrackCollection
-algList.append(DrawTracks(
-  "draw_trks",
-  colName="EFlowTrack",
-  marker=0,
-  layer=5,
-  size=3,
-  drawHelixForTracks=0,
-  colorScheme=7
-))
+# algList.append(DrawTracks(
+#  "draw_trks",
+#  colName="EFlowTrack",
+#  marker=0,
+#  layer=5,
+#  size=3,
+#  drawHelixForTracks=0,
+#  colorScheme=7
+# ))
 
 # edm4hep::VertexCollection
 algList.append(DrawVertices(
