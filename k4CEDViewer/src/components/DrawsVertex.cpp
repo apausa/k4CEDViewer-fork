@@ -21,46 +21,28 @@
 #include "k4FWCore/Consumer.h"
 #include "k4GaudiCED.h"
 
-#include "k4GaudiCEDUtils.h"
 #include "k4CEDColors.h"
+#include "k4GaudiCEDUtils.h"
 
 #include <string>
 
 using namespace k4ced;
 
-struct DrawVertices final
-  : k4FWCore::Consumer<void(const std::vector<const edm4hep::VertexCollection*>&)> {
+struct DrawVertices final : k4FWCore::Consumer<void(const std::vector<const edm4hep::VertexCollection*>&)> {
   DrawVertices(const std::string& name, ISvcLocator* svcLoc)
-  : Consumer(name, svcLoc, KeyValues("colName", {"Vertices"})) {
+      : Consumer(name, svcLoc, KeyValues("colName", {"Vertices"})) {
     k4GaudiCED::init(this);
   }
 
-  Gaudi::Property<int> layer{
-    this,
-    "layer",
-    6,
-    "layer to draw Vertices"
-  };
+  Gaudi::Property<int> layer{this, "layer", 6, "layer to draw Vertices"};
 
-  Gaudi::Property<int> size{
-    this,
-    "size",
-    2,
-    "size for drawing Vertices"};
+  Gaudi::Property<int> size{this, "size", 2, "size for drawing Vertices"};
 
-  Gaudi::Property<int> marker{
-    this,
-    "marker",
-    0,
-    "marker for drawing Vertices"
-  };
+  Gaudi::Property<int> marker{this, "marker", 0, "marker for drawing Vertices"};
 
-  Gaudi::Property<unsigned> colorScheme{
-    this,
-    "colorScheme",
-    12,
-    "Red:0,Orange:1,Plum:2,Violet:3,Blue:4,LightBlue:5,Aquamarine:6,Green:7,Olive:8,Yellow:9,Dark:10,Light:11,Classic:12"
-  };
+  Gaudi::Property<unsigned> colorScheme{this, "colorScheme", 12,
+                                        "Red:0,Orange:1,Plum:2,Violet:3,Blue:4,LightBlue:5,Aquamarine:6,Green:7,Olive:"
+                                        "8,Yellow:9,Dark:10,Light:11,Classic:12"};
 
   //===========================================================================================
 
@@ -96,15 +78,8 @@ struct DrawVertices final
       unsigned color = colors.current()[ic++ % colors.size()];
 
       for (auto h : *col) {
-        ced_hit_ID(
-          h.getPosition()[0],
-          h.getPosition()[1],
-          h.getPosition()[2],
-          marker,
-          layer,
-          size,
-          color,
-          myColID + h.id().index);
+        ced_hit_ID(h.getPosition()[0], h.getPosition()[1], h.getPosition()[2], marker, layer, size, color,
+                   myColID + h.id().index);
       }
     }
 
