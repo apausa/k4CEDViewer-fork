@@ -36,9 +36,9 @@ struct DrawVertices final : k4FWCore::Consumer<void(const std::vector<const edm4
 
   Gaudi::Property<int> layer{this, "layer", 6, "layer to draw Vertices"};
 
-  Gaudi::Property<int> size{this, "size", 2, "size for drawing Vertices"};
+  Gaudi::Property<int> size{this, "size", 10, "size for drawing Vertices"};
 
-  Gaudi::Property<int> marker{this, "marker", 0, "marker for drawing Vertices"};
+  Gaudi::Property<int> marker{this, "marker", 3, "marker for drawing Vertices"};
 
   Gaudi::Property<unsigned> colorScheme{this, "colorScheme", 12,
                                         "Red:0,Orange:1,Plum:2,Violet:3,Blue:4,LightBlue:5,Aquamarine:6,Green:7,Olive:"
