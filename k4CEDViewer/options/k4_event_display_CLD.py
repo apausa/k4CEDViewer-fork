@@ -120,7 +120,8 @@ algList.append(DrawVertices(
     "RefinedVertices",
   ],
   layer=6,
-  size=2,
+  size=100, # To differentiate vertices from calorimeter and tracker hits
+  marker=3 # Marker 1 has a 'x' shape, marker 2 has an '+' shape, marker 3 has an '*' shape.
 ))
 
 # edm4hep::ClusterCollection
