@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]
 
-file(GLOB _plugin_sources src/components/*.cpp src/draw/*.cpp)
+file(GLOB _plugin_sources src/components/*.cpp src/draw/*.cpp src/geometry/*.cpp)
 
 FOREACH( pkg CED)
     IF( ${pkg}_FOUND )
@@ -37,7 +37,7 @@ Gaudi_add_module(k4CEDViewerPlugins
                  EDM4HEP::edm4hep
                  )
 
-target_include_directories(k4CEDViewerPlugins PRIVATE src/components)
+target_include_directories(k4CEDViewerPlugins PRIVATE src/components src/geometry)
 
 install(TARGETS k4CEDViewerPlugins
   EXPORT ${CMAKE_PROJECT_NAME}Targets
