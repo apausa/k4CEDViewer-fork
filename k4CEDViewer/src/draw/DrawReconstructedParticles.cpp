@@ -18,6 +18,7 @@
  */
 
 #include "ColorMap.h"
+#include "HelixGeometry.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
 #include "k4CEDColors.h"
 #include "k4FWCore/Consumer.h"
@@ -415,9 +416,9 @@ struct DrawReconstructedParticles final : k4FWCore::Consumer<void(const edm4hep:
 
               int helixColor = (useColorForHelixTracks ? color : 0xdddddd);
 
-              k4GaudiCED::drawHelix(bField, charge, Xs, Ys, Zs, Px, Py, Pz,
-                                    marker | (layer << CED_LAYER_SHIFT), // fixme - is this correct ???
-                                    size, helixColor, 0.0, _helix_max_r, _helix_max_z, thePartIndex);
+              drawHelix(bField, charge, Xs, Ys, Zs, Px, Py, Pz,
+                        marker | (layer << CED_LAYER_SHIFT), // fixme - is this correct ???
+                        size, helixColor, 0.0, _helix_max_r, _helix_max_z, thePartIndex);
             }
           }
         }

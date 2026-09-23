@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include "HelixGeometry.h"
 #include "edm4hep/TrackCollection.h"
 #include "k4CEDColors.h"
 #include "k4FWCore/Consumer.h"
@@ -172,8 +173,8 @@ struct DrawTracks final : k4FWCore::Consumer<void(const edm4hep::TrackCollection
 
         int helixColor = (useColorForHelixTracks ? color : 0xdddddd);
 
-        k4GaudiCED::drawHelix(bField, charge, xs, ys, zs, px, py, pz, layer, lineThickness, helixColor, 0.0,
-                              _helix_max_r, _helix_max_z, myColID + trk.id().index);
+        drawHelix(bField, charge, xs, ys, zs, px, py, pz, layer, lineThickness, helixColor, 0.0, _helix_max_r,
+                  _helix_max_z, myColID + trk.id().index);
       }
     }
 

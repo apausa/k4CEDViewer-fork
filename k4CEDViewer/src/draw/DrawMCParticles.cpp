@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include "HelixGeometry.h"
 #include "edm4hep/MCParticleCollection.h"
 #include "k4FWCore/Consumer.h"
 #include "k4GaudiCED.h"
@@ -138,8 +139,7 @@ struct DrawMCParticles final : k4FWCore::Consumer<void(const edm4hep::MCParticle
           hmz = hcalEndcapParams.z_0 + hcalEndcapParams.delta_z;
         }
 
-        k4GaudiCED::drawHelix(bField, charge, x, y, z, px, py, pz, layer, size, 0x7af774, 0.0, hmr, hmz,
-                              myColID + mcp.id().index);
+        drawHelix(bField, charge, x, y, z, px, py, pz, layer, size, 0x7af774, 0.0, hmr, hmz, myColID + mcp.id().index);
 
       } else { // neutral
         int color;
