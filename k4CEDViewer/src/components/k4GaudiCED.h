@@ -177,12 +177,6 @@ public:
   //     }
   //   }
 
-  /** Draws a helix from the given point(x,y,z) for momentum(px,py,pz) in a B-field b (in Tesla)
-   */
-  static void drawHelix(float b, float charge, float x, float y, float z, float px, float py, float pz, int marker,
-                        int size, unsigned int col, float rmin = 10.0, float rmax = 3000.0, float zmax = 4500.0,
-                        unsigned int id = 0);
-
   /*************************/
   //  static int getIDfromIndex(LCCollection* col, int index);
 
@@ -311,10 +305,6 @@ protected:
   //   }
   // }
 };
-
-extern "C" void DDdraw_helix(float b, float charge, float x, float y, float z, float px, float py, float pz, int marker,
-                             int size, unsigned int col, float rmin = 10.0, float rmax = 3000.0, float zmax = 4500.0,
-                             unsigned int id = 0);
 
 } // namespace k4ced
 
