@@ -28,18 +28,9 @@
 #include <string>
 #include <vector>
 
-typedef std::vector<std::string> StringVec;
-
 #include "ced_cli.h"
 
 #include <ctime>
-
-// Includes for detector drawing
-#include "DD4hep/DD4hepUnits.h"
-#include "DD4hep/Detector.h"
-#include "DDRec/DetectorData.h"
-#include "DDRec/Surface.h"
-#include "DDRec/SurfaceManager.h"
 
 #include "k4GaudiCEDUtils.h"
 
@@ -199,18 +190,6 @@ public:
   static void add_layer_description(const std::string& desc, int layerID);
   static void write_layer_description(void);
 
-  /* Draws the detector geometry for CLIC and ILD.
-   * features:
-   * - improved, i.e. more exact, placements
-   * - generic
-   * - no GEAR dependence
-   * - surface (optionally) drawn as set of lines
-   *
-   * author: Thorben Quast, CERN Summer Student 2015
-   * date: 31/07/2015
-   */
-  static void drawDD4hepDetector(dd4hep::Detector& theDetector, bool _surfaces, StringVec _detailled);
-
 private:
   static int _int_count;
   static std::vector<std::string> _descs;
@@ -336,67 +315,6 @@ protected:
 extern "C" void DDdraw_helix(float b, float charge, float x, float y, float z, float px, float py, float pz, int marker,
                              int size, unsigned int col, float rmin = 10.0, float rmax = 3000.0, float zmax = 4500.0,
                              unsigned int id = 0);
-
-/******* HELPERS ********/
-
-// read out of the "_detailled" parameter
-bool detailledDrawing(StringVec _detailled, std::string detName);
-
-// Set of geometric parameters for initialization of a CEDGeoBox class object
-struct CEDGeoBox {
-  double sizes[3];
-  double center[3];
-  double rotate[3];
-};
-// Set of geometric parameters for initialization of a CEDGeoTube class object
-struct CEDGeoTubeParams {
-  double Rmax;
-  double Rmin;
-  double inner_symmetry;
-  double outer_symmetry;
-  double phi0;
-  double delta_phi;
-  double delta_z;
-  double z0;
-  // boolean that decides if the GeoTube is drawn twice at two different zPositions
-  bool isBarrel;
-};
-
-// Convenient summary of both parameter sets above as (tracker) layers may be drawn as one tube or as a sequence of
-// staves (-->GeoBox)
-struct LayerGeometry {
-  CEDGeoTubeParams tube{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false};
-  std::vector<CEDGeoBox> staves{};
-};
-
-void getVisAttributes(dd4hep::DetElement det, unsigned& color, bool& visible);
-
-/***detector draw helpers***/
-
-// converts the parameters in LayeredCalorimeterData given by the appropriate drivers
-// into those required by the CEDGeoTube
-CEDGeoTubeParams CalorimeterParameterConversion(dd4hep::rec::LayeredCalorimeterData* calo);
-
-// converts the parameters in ZDiskPetalsData given by the appropriate drivers
-// into those required by the CEDGeoTube
-CEDGeoTubeParams PetalParameterConversion(std::vector<dd4hep::rec::ZDiskPetalsData::LayerLayout>::iterator thisLayer);
-
-// converts the parameters from a LayeredCalorimeterData layer given by the appropriate drivers
-// into those required by the CEDGeoTube
-CEDGeoTubeParams
-CalorimeterLayerParameterConversion(std::vector<dd4hep::rec::LayeredCalorimeterData::Layer>::iterator thisLayer);
-
-// converts the parameters from a FixedPadSizeTPCData given by the appropriate drivers
-// into those required by the CEDGeoTube
-CEDGeoTubeParams TPCParameterConversion(dd4hep::rec::FixedPadSizeTPCData* tpc);
-
-// converts the parameters from a ZPlanarData::LayerLayout layer given by the appropriate drivers
-// into those required by the CEDGeoBox (for drawing of staves) or by CEDGeoTube (for approximation of the set of staves
-// into tubes)
-LayerGeometry TrackerLayerParameterConversion(std::vector<dd4hep::rec::ZPlanarData::LayerLayout>::iterator thisLayer);
-
-// draws the given surfaces as a set of individual lines
-bool DrawSurfaces(const dd4hep::rec::SurfaceManager& surfMan, std::string detName, unsigned color, int layer);
 
 } // namespace k4ced
 
