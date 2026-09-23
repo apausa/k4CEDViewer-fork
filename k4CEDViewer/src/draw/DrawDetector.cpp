@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include "DetectorGeometry.h"
 #include "edm4hep/MCParticleCollection.h"
 #include "k4FWCore/Consumer.h"
 #include "k4GaudiCED.h"
@@ -55,7 +56,7 @@ struct DrawDetector final : k4FWCore::Consumer<void(const edm4hep::MCParticleCol
 
     //------------------------
 
-    k4GaudiCED::drawDD4hepDetector(theDetector, drawSurfaces, drawDetailed);
+    drawDD4hepDetector(theDetector, drawSurfaces, drawDetailed);
 
     //------------------------
 
